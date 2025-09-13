@@ -10,6 +10,11 @@ name: Java CI with Maven
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'SemVer'
+        required: true
+        default: '2.1.7'
 
 jobs:
   build:
@@ -36,7 +41,7 @@ jobs:
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ env.TAG_NAME }}
+        tag_name: ${{ inputs.version }}
         files: target/*.jar
         draft: false
         prerelease: false
