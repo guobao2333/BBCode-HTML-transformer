@@ -13,8 +13,8 @@ on:
     inputs:
       version:
         description: 'SemVer'
-        required: true
-        default: '2.1.7'
+        required: false
+        #default: '2.1.7'
 
 jobs:
   build:
@@ -30,7 +30,10 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: |
+        mvn -B package --file pom.xml
+        VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
 
     - name: Upload JAR artifact
       uses: actions/upload-artifact@v4
@@ -41,7 +44,7 @@ jobs:
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ inputs.version }}
+        tag_name: ${{ inputs.version || env.RELEASE_VERSION }}
         files: target/*.jar
         draft: false
         prerelease: false
